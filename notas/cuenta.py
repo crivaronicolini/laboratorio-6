@@ -39,9 +39,7 @@ w = np.linspace(0, 2000, 2000) * u.Hz
 
 denomL = (1/(W - w**2))
 numerL = (B**2 * l)/conv
-denomalpha = (1/np.sqrt(W*(2*w*z)**2+(W - w**2)**2))
 L = (16*numerL*denomL).to(u.H)
-alpha = (16*numerL*denomalpha).to(u.H)
 
 
 # plt.ion()
@@ -52,32 +50,89 @@ alpha = (16*numerL*denomalpha).to(u.H)
 # plt.ylabel(r'$\epsilon \ [V]$')
 # plt.grid()
 
+# phi sin dampening
 phi = np.arctan(w*L/R)
+plt.figure(num=1)
+plt.plot(w, phi.to(u.degree))
+plt.grid()
+plt.tight_layout()
+
+# I = (np.cos(w*1*u.s + phi)*V/np.sqrt(R**2 + w**2 * L**2)).to(u.A)
+I = (V/np.sqrt(R**2 + w**2 * L**2)).to(u.uA)
+v = np.cos(w*1*u.s)*V
+plt.figure(num=2)
+# plt.title('otra corriente primario sin dampening')
+plt.plot(w, I)
+# plt.plot(w, v/u.V)
+plt.grid()
+plt.tight_layout()
+
+# I = (np.cos(w*1*u.s + phi)*V/np.sqrt(R**2 + w**2 * L**2)).to(u.A)
+I = ((R)*V/(R**2 + w**2 * L**2)).to(u.uA)
+v = np.cos(w*1*u.s)*V
+plt.figure(num=2)
+# plt.title('otra corriente primario sin dampening')
+plt.plot(w, I)
+# plt.plot(w, v/u.V)
+plt.grid()
+plt.tight_layout()
 
 # I = (np.cos(w*1*u.s + phi)*V/np.sqrt(R**2 + w**2 * L**2)).to(u.A)
 I = ((w * L)*V/(R**2 + w**2 * L**2)).to(u.uA)
 v = np.cos(w*1*u.s)*V
-plt.plot(w, phi.to(u.degree))
-plt.plot(w, np.abs(I))
-plt.plot(w, v/u.V)
+plt.figure(num=2)
+plt.title('corriente primario sin dampening')
+plt.plot(w, I)
+# plt.plot(w, v/u.V)
 plt.grid()
 plt.tight_layout()
-plt.show()
 
-
-plt.figure()
+plt.figure(num=3)
+plt.title('voltaje secundario sin dampening')
 plt.plot(w, np.abs((Rmuestra*I).to(u.uV)))
 plt.grid()
 plt.tight_layout()
 
-plt.figure()
+plt.figure(num=4)
+plt.title('no se qu es')
 plt.plot(w, np.abs((Wnat*L/R)))
 plt.grid()
 plt.tight_layout()
 
-
+denomalpha = (1/np.sqrt(W*(2*w*z)**2+(W - w**2)**2))
+alpha = (16*numerL*denomalpha).to(u.H)
 Ic = ((w * alpha)*V/(R**2 + w**2 * alpha**2)).to(u.uA)
-plt.figure()
-plt.plot(w, np.abs(Ic))
+
+plt.figure(num=10)
+plt.title('corriente en primario con amortiguamiento')
+plt.grid()
+for z in np.arange(0.01, 0.1, 0.02):
+    denomalpha = (1/np.sqrt(W*(2*w*z)**2+(W - w**2)**2))
+    alpha = (16*numerL*denomalpha).to(u.H)
+    # Ic = (V/np.sqrt(R**2 + w**2 * alpha**2)).to(u.uA)
+    Ic = ((w * alpha)*V/(R**2 + w**2 * alpha**2)).to(u.uA)
+    # plt.figure(num=5)
+    # plt.plot(w, np.abs(Ic), label=f'z= {z:.1f}')
+    plt.figure(num=11)
+    plt.plot(w, np.abs((Rmuestra*Ic).to(u.uV)), label=f'z= {z:.2f}')
+plt.figure(num=11)
+plt.legend()
+plt.tight_layout()
+
+
+plt.figure(num=7)
+plt.title('voltaje secundario sin dampening')
+plt.title('voltaje secundario con dampening')
+plt.plot(w, np.abs((Rmuestra*Ic).to(u.uV)))
+plt.grid()
+plt.legend()
+plt.tight_layout()
+
+# phi con dampening
+plt.figure(num=6)
+phimec = np.arctan(2*w*Wnat*z/(w**2 - W))
+phi = np.arctan(alpha*w*np.sin(phimec)/R)
+plt.title('desfasaje total con amortiguamiento')
+plt.plot(w, phi.to(u.degree))
 plt.grid()
 plt.tight_layout()
